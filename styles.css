@@ -105,6 +105,40 @@ button:hover {
     text-shadow: 0 0 10px rgba(160, 160, 255, 0.5);
 }
 
+.sun-times {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin: 1.5rem 0;
+}
+
+.sun-time {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 1.2rem;
+}
+
+.sun-time .label {
+    font-weight: 300;
+    opacity: 0.8;
+    margin-bottom: 0.3rem;
+}
+
+.sun-time .time {
+    font-weight: 500;
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+.sunrise .time {
+    color: #87ceeb;
+}
+
+.sunset .time {
+    color: #ffa07a;
+}
+
 .error {
     color: #ff4d4d;
     display: none;

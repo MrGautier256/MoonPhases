@@ -24,9 +24,11 @@ function updateMoonData(data) {
     const moonImage = document.getElementById('moonImage');
     const phaseName = document.getElementById('phaseName');
     const illuminationPercent = document.getElementById('illuminationPercent');
+    const sunriseTime = document.getElementById('sunriseTime');
+    const sunsetTime = document.getElementById('sunsetTime');
+
     const { fr: translatedName, img: imagePath, flip } = phaseTranslation[data.moon_phase];
 
-    // Mise à jour de l'image et du nom
     moonImage.style.opacity = 0;
     setTimeout(() => {
         moonImage.src = imagePath;
@@ -34,9 +36,10 @@ function updateMoonData(data) {
         moonImage.style.opacity = 1;
     }, 300);
 
-    // Mise à jour des textes
     phaseName.textContent = translatedName;
-    illuminationPercent.textContent = `Luminosité : ${data.moon_illumination_percentage}%`;
+    illuminationPercent.textContent = `Luminosité de la lune: ${data.moon_illumination_percentage}%`;
+    sunriseTime.textContent = data.sunrise;
+    sunsetTime.textContent = data.sunset;
 }
 
 async function getMoonPhase() {
@@ -50,7 +53,7 @@ async function getMoonPhase() {
         const data = await response.json();
         if (!phaseTranslation[data.moon_phase]) throw new Error('Phase non reconnue');
 
-        updateMoonData(data); // Appel modifié
+        updateMoonData(data);
     } catch (error) {
         showError(`Erreur : ${error.message}`);
         console.error('Détails:', error);
