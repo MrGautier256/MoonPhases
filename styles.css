@@ -98,6 +98,13 @@ button:hover {
     transform: scale(1.05);
 }
 
+.illumination-percent {
+    font-size: 1.4rem;
+    margin: 0.5rem 0;
+    color: #a0a0ff;
+    text-shadow: 0 0 10px rgba(160, 160, 255, 0.5);
+}
+
 .error {
     color: #ff4d4d;
     display: none;

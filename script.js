@@ -20,20 +20,23 @@ function showError(message) {
     errorDiv.style.display = 'block';
 }
 
-function updateMoonPhase(phase) {
+function updateMoonData(data) {
     const moonImage = document.getElementById('moonImage');
     const phaseName = document.getElementById('phaseName');
-    const { fr: translatedName, img: imagePath, flip } = phaseTranslation[phase];
+    const illuminationPercent = document.getElementById('illuminationPercent');
+    const { fr: translatedName, img: imagePath, flip } = phaseTranslation[data.moon_phase];
 
+    // Mise à jour de l'image et du nom
     moonImage.style.opacity = 0;
-
     setTimeout(() => {
         moonImage.src = imagePath;
         moonImage.classList.toggle('flipped', flip);
         moonImage.style.opacity = 1;
     }, 300);
 
+    // Mise à jour des textes
     phaseName.textContent = translatedName;
+    illuminationPercent.textContent = `Luminosité : ${data.moon_illumination_percentage}%`;
 }
 
 async function getMoonPhase() {
@@ -47,7 +50,7 @@ async function getMoonPhase() {
         const data = await response.json();
         if (!phaseTranslation[data.moon_phase]) throw new Error('Phase non reconnue');
 
-        updateMoonPhase(data.moon_phase);
+        updateMoonData(data); // Appel modifié
     } catch (error) {
         showError(`Erreur : ${error.message}`);
         console.error('Détails:', error);
