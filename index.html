@@ -12,8 +12,20 @@
     <div class="constellation" id="constellation"></div>
 
     <div class="container">
-        <h1>Phase Lunaire Actuelle</h1>
+        <h1>Phase Lunaire</h1>
+
+        <div class="date-controls">
+            <div class="date-input-group">
+                <button id="currentBtn" class="active">Aujourd'hui</button>
+                <button id="customBtn">Date personnalisée</button>
+            </div>
+            <div id="dateInputContainer" style="display: none;">
+                <input type="date" id="dateInput">
+            </div>
+        </div>
+
         <div class="loader" id="loader"></div>
+        <div class="date-display" id="dateDisplay"></div>
         <div class="moon-container">
             <img id="moonImage" src="" alt="Phase lunaire">
         </div>
@@ -31,7 +43,6 @@
         </div>
         <div class="error" id="errorMessage"></div>
     </div>
-
     <script src="script.js"></script>
 </body>
 

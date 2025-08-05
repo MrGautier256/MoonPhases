@@ -1,4 +1,4 @@
-const API_KEY = 'REMOVED_API_KEY ';
+const API_KEY = 'REMOVED_API_KEY';
 const phaseTranslation = {
     'NEW_MOON': { fr: 'Nouvelle Lune', img: 'images/new.svg', flip: false },
     'WAXING_CRESCENT': { fr: 'Premier Croissant', img: 'images/waxing-crescent.svg', flip: false },
@@ -10,6 +10,8 @@ const phaseTranslation = {
     'WANING_CRESCENT': { fr: 'Dernier Croissant', img: 'images/waxing-crescent.svg', flip: true }
 };
 
+let currentMode = 'current';
+
 function showLoader(show) {
     document.getElementById('loader').style.display = show ? 'block' : 'none';
 }
@@ -20,12 +22,23 @@ function showError(message) {
     errorDiv.style.display = 'block';
 }
 
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('fr-FR', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
+}
+
 function updateMoonData(data) {
     const moonImage = document.getElementById('moonImage');
     const phaseName = document.getElementById('phaseName');
     const illuminationPercent = document.getElementById('illuminationPercent');
     const sunriseTime = document.getElementById('sunriseTime');
     const sunsetTime = document.getElementById('sunsetTime');
+    const dateDisplay = document.getElementById('dateDisplay');
 
     const { fr: translatedName, img: imagePath, flip } = phaseTranslation[data.moon_phase];
 
@@ -37,17 +50,29 @@ function updateMoonData(data) {
     }, 300);
 
     phaseName.textContent = translatedName;
-    illuminationPercent.textContent = `Luminosité de la lune: ${data.moon_illumination_percentage}%`;
+    illuminationPercent.textContent = `Luminosité de la lune: ${Math.abs(Number(data.moon_illumination_percentage))}%`;
     sunriseTime.textContent = data.sunrise;
     sunsetTime.textContent = data.sunset;
+
+    if (data.date) {
+        dateDisplay.textContent = formatDate(data.date);
+        dateDisplay.style.display = 'block';
+    } else {
+        dateDisplay.style.display = 'none';
+    }
 }
 
-async function getMoonPhase() {
+async function getMoonPhase(date = null) {
     try {
         showLoader(true);
         document.getElementById('errorMessage').style.display = 'none';
 
-        const response = await fetch(`https://api.ipgeolocation.io/astronomy?apiKey=${API_KEY}`);
+        let url = `https://api.ipgeolocation.io/astronomy?apiKey=${API_KEY}`;
+        if (date) {
+            url += `&date=${date}`;
+        }
+
+        const response = await fetch(url);
         if (!response.ok) throw new Error('Erreur de réseau');
 
         const data = await response.json();
@@ -62,7 +87,6 @@ async function getMoonPhase() {
     }
 }
 
-// Génération des étoiles
 function createStars() {
     const container = document.getElementById('constellation');
     const starCount = 200;
@@ -77,6 +101,34 @@ function createStars() {
         container.appendChild(star);
     }
 }
+
+// Event listeners
+document.getElementById('currentBtn').addEventListener('click', () => {
+    currentMode = 'current';
+    document.getElementById('currentBtn').classList.add('active');
+    document.getElementById('customBtn').classList.remove('active');
+    document.getElementById('dateInputContainer').style.display = 'none';
+    getMoonPhase();
+});
+
+document.getElementById('customBtn').addEventListener('click', () => {
+    currentMode = 'custom';
+    document.getElementById('customBtn').classList.add('active');
+    document.getElementById('currentBtn').classList.remove('active');
+    document.getElementById('dateInputContainer').style.display = 'block';
+
+    // Set today's date as default
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('dateInput').value = today;
+});
+
+
+document.getElementById('dateInput').addEventListener('change', () => {
+    const selectedDate = document.getElementById('dateInput').value;
+    if (selectedDate) {
+        getMoonPhase(selectedDate);
+    }
+});
 
 // Initialisation
 document.addEventListener('DOMContentLoaded', () => {
