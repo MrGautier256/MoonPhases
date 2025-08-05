@@ -14,7 +14,9 @@ let currentMode = 'current';
 let currentLat = null;
 let currentLon = null;
 let map = null;
+let searchTimeout = null;
 
+// Éléments DOM
 const currentBtn = document.getElementById('currentBtn');
 const customBtn = document.getElementById('customBtn');
 const dateInput = document.getElementById('dateInput');
@@ -28,6 +30,7 @@ const addressField = document.getElementById('addressField');
 const searchAddressBtn = document.getElementById('searchAddressBtn');
 const mapContainer = document.getElementById('mapContainer');
 const currentLocationDiv = document.getElementById('currentLocation');
+const addressSuggestions = document.getElementById('addressSuggestions');
 
 function showLoader(show) {
     document.getElementById('loader').style.display = show ? 'block' : 'none';
@@ -124,6 +127,64 @@ function createStars() {
     }
 }
 
+async function searchAddressSuggestions(query) {
+    if (query.length < 3) {
+        addressSuggestions.style.display = 'none';
+        return;
+    }
+
+    try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=5&addressdetails=1`);
+        const data = await response.json();
+
+        if (data && data.length > 0) {
+            displaySuggestions(data);
+        } else {
+            addressSuggestions.style.display = 'none';
+        }
+    } catch (error) {
+        console.error('Erreur lors de la recherche de suggestions:', error);
+        addressSuggestions.style.display = 'none';
+    }
+}
+
+function displaySuggestions(suggestions) {
+    addressSuggestions.innerHTML = '';
+
+    suggestions.forEach(suggestion => {
+        const item = document.createElement('div');
+        item.className = 'suggestion-item';
+
+        const mainText = suggestion.display_name.split(',')[0];
+        const detailText = suggestion.display_name.split(',').slice(1, 3).join(',');
+
+        item.innerHTML = `
+                    <div class="suggestion-main">${mainText}</div>
+                    <div class="suggestion-detail">${detailText}</div>
+                `;
+
+        item.addEventListener('click', () => {
+            selectSuggestion(suggestion);
+        });
+
+        addressSuggestions.appendChild(item);
+    });
+
+    addressSuggestions.style.display = 'block';
+}
+
+function selectSuggestion(suggestion) {
+    addressField.value = suggestion.display_name;
+    addressSuggestions.style.display = 'none';
+
+    currentLat = parseFloat(suggestion.lat);
+    currentLon = parseFloat(suggestion.lon);
+    currentLocationDiv.textContent = `📍 ${suggestion.display_name}`;
+    currentLocationDiv.style.display = 'block';
+    getMoonPhase(currentMode === 'custom' ? dateInput.value : null);
+    locationOptions.style.display = 'none';
+}
+
 toggleLocationBtn.addEventListener('click', () => {
     const isVisible = locationOptions.style.display !== 'none';
     locationOptions.style.display = isVisible ? 'none' : 'block';
@@ -137,6 +198,7 @@ currentLocationBtn.addEventListener('click', () => {
 addressBtn.addEventListener('click', () => {
     hideLocationInputs();
     addressInput.style.display = 'flex';
+    addressField.focus();
 });
 
 mapBtn.addEventListener('click', () => {
@@ -151,15 +213,35 @@ searchAddressBtn.addEventListener('click', () => {
     }
 });
 
+addressField.addEventListener('input', (e) => {
+    const query = e.target.value.trim();
+
+    if (searchTimeout) {
+        clearTimeout(searchTimeout);
+    }
+
+    searchTimeout = setTimeout(() => {
+        searchAddressSuggestions(query);
+    }, 300);
+});
+
 addressField.addEventListener('keypress', (e) => {
     if (e.key === 'Enter') {
+        addressSuggestions.style.display = 'none';
         searchAddressBtn.click();
+    }
+});
+
+document.addEventListener('click', (e) => {
+    if (!addressInput.contains(e.target)) {
+        addressSuggestions.style.display = 'none';
     }
 });
 
 function hideLocationInputs() {
     addressInput.style.display = 'none';
     mapContainer.style.display = 'none';
+    addressSuggestions.style.display = 'none';
 }
 
 function getCurrentLocation() {
@@ -176,8 +258,11 @@ function getCurrentLocation() {
                 locationOptions.style.display = 'none';
             },
             (error) => {
-                currentLocationDiv.textContent = '❌ Impossible d\'obtenir la localisation';
-                console.error('Erreur de géolocalisation:', error);
+                currentLocationDiv.textContent = '📍 Utilisation de votre position IP';
+                currentLocationDiv.style.display = 'block';
+                getMoonPhase(currentMode === 'custom' ? dateInput.value : null);
+                locationOptions.style.display = 'none';
+                console.log('Géolocalisation refusée, utilisation de la position IP:', error);
             }
         );
     } else {
@@ -189,32 +274,41 @@ function showMap() {
     mapContainer.style.display = 'block';
 
     if (!map) {
-        map = L.map('mapContainer').setView([46.603354, 1.888334], 6);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
+        setTimeout(() => {
+            map = L.map('mapContainer').setView([46.603354, 1.888334], 6);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
 
-        map.on('click', (e) => {
-            currentLat = e.latlng.lat;
-            currentLon = e.latlng.lng;
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 100);
 
-            map.eachLayer((layer) => {
-                if (layer instanceof L.Marker) {
-                    map.removeLayer(layer);
-                }
+            map.on('click', (e) => {
+                currentLat = e.latlng.lat;
+                currentLon = e.latlng.lng;
+
+                map.eachLayer((layer) => {
+                    if (layer instanceof L.Marker) {
+                        map.removeLayer(layer);
+                    }
+                });
+
+                L.marker([currentLat, currentLon]).addTo(map);
+                currentLocationDiv.textContent = `📍 Position sélectionnée (${currentLat.toFixed(4)}, ${currentLon.toFixed(4)})`;
+                currentLocationDiv.style.display = 'block';
+                getMoonPhase(currentMode === 'custom' ? dateInput.value : null);
+                locationOptions.style.display = 'none';
             });
-
-            L.marker([currentLat, currentLon]).addTo(map);
-            currentLocationDiv.textContent = `📍 Position sélectionnée (${currentLat.toFixed(4)}, ${currentLon.toFixed(4)})`;
-            currentLocationDiv.style.display = 'block';
-            getMoonPhase(currentMode === 'custom' ? dateInput.value : null);
-            locationOptions.style.display = 'none';
-        });
+        }, 300);
+    } else {
+        setTimeout(() => {
+            map.invalidateSize();
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 100);
+        }, 100);
     }
-
-    setTimeout(() => {
-        map.invalidateSize();
-    }, 100);
 }
 
 function geocodeAddress(address) {
@@ -265,7 +359,6 @@ dateInput.addEventListener('change', () => {
     }
 });
 
-// Initialisation
 document.addEventListener('DOMContentLoaded', () => {
     createStars();
     getMoonPhase();

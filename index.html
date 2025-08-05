@@ -23,6 +23,7 @@
                 <input type="date" id="dateInput">
             </div>
 
+            <!-- Location Controls -->
             <button id="toggleLocationBtn" class="location-toggle-btn">
                 📍 Changer la Localisation
             </button>
@@ -42,8 +43,11 @@
                 </div>
 
                 <div id="addressInput" class="address-input" style="display: none;">
-                    <input type="text" id="addressField" placeholder="Entrez une adresse...">
-                    <button id="searchAddressBtn">Rechercher</button>
+                    <div class="address-input-row">
+                        <input type="text" id="addressField" placeholder="Entrez une adresse..." autocomplete="off">
+                        <button id="searchAddressBtn">Rechercher</button>
+                    </div>
+                    <div id="addressSuggestions" class="address-suggestions" style="display: none;"></div>
                 </div>
 
                 <div id="mapContainer"
