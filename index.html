@@ -22,10 +22,38 @@
             <div id="dateInputContainer" style="display: none;">
                 <input type="date" id="dateInput">
             </div>
+
+            <button id="toggleLocationBtn" class="location-toggle-btn">
+                📍 Changer la Localisation
+            </button>
+
+            <div id="locationOptions" class="location-options" style="display: none;">
+                <h4>📍 Localisation</h4>
+                <div class="location-buttons">
+                    <button id="currentLocationBtn" class="location-btn">
+                        📍 Ma position
+                    </button>
+                    <button id="addressBtn" class="location-btn">
+                        🏠 Adresse
+                    </button>
+                    <button id="mapBtn" class="location-btn">
+                        🗺️ Carte
+                    </button>
+                </div>
+
+                <div id="addressInput" class="address-input" style="display: none;">
+                    <input type="text" id="addressField" placeholder="Entrez une adresse...">
+                    <button id="searchAddressBtn">Rechercher</button>
+                </div>
+
+                <div id="mapContainer"
+                    style="display: none; height: 300px; margin-top: 10px; border-radius: 8px; overflow: hidden;"></div>
+            </div>
         </div>
 
         <div class="loader" id="loader"></div>
         <div class="date-display" id="dateDisplay"></div>
+        <div class="current-location" id="currentLocation"></div>
         <div class="moon-container">
             <img id="moonImage" src="" alt="Phase lunaire">
         </div>
@@ -43,6 +71,8 @@
         </div>
         <div class="error" id="errorMessage"></div>
     </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="script.js"></script>
 </body>
 

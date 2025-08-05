@@ -11,6 +11,23 @@ const phaseTranslation = {
 };
 
 let currentMode = 'current';
+let currentLat = null;
+let currentLon = null;
+let map = null;
+
+const currentBtn = document.getElementById('currentBtn');
+const customBtn = document.getElementById('customBtn');
+const dateInput = document.getElementById('dateInput');
+const toggleLocationBtn = document.getElementById('toggleLocationBtn');
+const locationOptions = document.getElementById('locationOptions');
+const currentLocationBtn = document.getElementById('currentLocationBtn');
+const addressBtn = document.getElementById('addressBtn');
+const mapBtn = document.getElementById('mapBtn');
+const addressInput = document.getElementById('addressInput');
+const addressField = document.getElementById('addressField');
+const searchAddressBtn = document.getElementById('searchAddressBtn');
+const mapContainer = document.getElementById('mapContainer');
+const currentLocationDiv = document.getElementById('currentLocation');
 
 function showLoader(show) {
     document.getElementById('loader').style.display = show ? 'block' : 'none';
@@ -68,6 +85,11 @@ async function getMoonPhase(date = null) {
         document.getElementById('errorMessage').style.display = 'none';
 
         let url = `https://api.ipgeolocation.io/astronomy?apiKey=${API_KEY}`;
+
+        if (currentLat && currentLon) {
+            url += `&lat=${currentLat}&long=${currentLon}`;
+        }
+
         if (date) {
             url += `&date=${date}`;
         }
@@ -102,29 +124,142 @@ function createStars() {
     }
 }
 
-// Event listeners
-document.getElementById('currentBtn').addEventListener('click', () => {
+toggleLocationBtn.addEventListener('click', () => {
+    const isVisible = locationOptions.style.display !== 'none';
+    locationOptions.style.display = isVisible ? 'none' : 'block';
+});
+
+currentLocationBtn.addEventListener('click', () => {
+    getCurrentLocation();
+    hideLocationInputs();
+});
+
+addressBtn.addEventListener('click', () => {
+    hideLocationInputs();
+    addressInput.style.display = 'flex';
+});
+
+mapBtn.addEventListener('click', () => {
+    hideLocationInputs();
+    showMap();
+});
+
+searchAddressBtn.addEventListener('click', () => {
+    const address = addressField.value.trim();
+    if (address) {
+        geocodeAddress(address);
+    }
+});
+
+addressField.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        searchAddressBtn.click();
+    }
+});
+
+function hideLocationInputs() {
+    addressInput.style.display = 'none';
+    mapContainer.style.display = 'none';
+}
+
+function getCurrentLocation() {
+    currentLocationDiv.textContent = '📍 Localisation en cours...';
+    currentLocationDiv.style.display = 'block';
+
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                currentLat = position.coords.latitude;
+                currentLon = position.coords.longitude;
+                currentLocationDiv.textContent = `📍 Position actuelle (${currentLat.toFixed(4)}, ${currentLon.toFixed(4)})`;
+                getMoonPhase(currentMode === 'custom' ? dateInput.value : null);
+                locationOptions.style.display = 'none';
+            },
+            (error) => {
+                currentLocationDiv.textContent = '❌ Impossible d\'obtenir la localisation';
+                console.error('Erreur de géolocalisation:', error);
+            }
+        );
+    } else {
+        currentLocationDiv.textContent = '❌ Géolocalisation non supportée';
+    }
+}
+
+function showMap() {
+    mapContainer.style.display = 'block';
+
+    if (!map) {
+        map = L.map('mapContainer').setView([46.603354, 1.888334], 6);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        map.on('click', (e) => {
+            currentLat = e.latlng.lat;
+            currentLon = e.latlng.lng;
+
+            map.eachLayer((layer) => {
+                if (layer instanceof L.Marker) {
+                    map.removeLayer(layer);
+                }
+            });
+
+            L.marker([currentLat, currentLon]).addTo(map);
+            currentLocationDiv.textContent = `📍 Position sélectionnée (${currentLat.toFixed(4)}, ${currentLon.toFixed(4)})`;
+            currentLocationDiv.style.display = 'block';
+            getMoonPhase(currentMode === 'custom' ? dateInput.value : null);
+            locationOptions.style.display = 'none';
+        });
+    }
+
+    setTimeout(() => {
+        map.invalidateSize();
+    }, 100);
+}
+
+function geocodeAddress(address) {
+    currentLocationDiv.textContent = '🔍 Recherche de l\'adresse...';
+    currentLocationDiv.style.display = 'block';
+
+    fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.length > 0) {
+                currentLat = parseFloat(data[0].lat);
+                currentLon = parseFloat(data[0].lon);
+                currentLocationDiv.textContent = `📍 ${data[0].display_name}`;
+                getMoonPhase(currentMode === 'custom' ? dateInput.value : null);
+                locationOptions.style.display = 'none';
+            } else {
+                currentLocationDiv.textContent = '❌ Adresse non trouvée';
+            }
+        })
+        .catch(error => {
+            currentLocationDiv.textContent = '❌ Erreur lors de la recherche';
+            console.error('Erreur de géocodage:', error);
+        });
+}
+
+currentBtn.addEventListener('click', () => {
     currentMode = 'current';
-    document.getElementById('currentBtn').classList.add('active');
-    document.getElementById('customBtn').classList.remove('active');
+    currentBtn.classList.add('active');
+    customBtn.classList.remove('active');
     document.getElementById('dateInputContainer').style.display = 'none';
     getMoonPhase();
 });
 
-document.getElementById('customBtn').addEventListener('click', () => {
+customBtn.addEventListener('click', () => {
     currentMode = 'custom';
-    document.getElementById('customBtn').classList.add('active');
-    document.getElementById('currentBtn').classList.remove('active');
+    customBtn.classList.add('active');
+    currentBtn.classList.remove('active');
     document.getElementById('dateInputContainer').style.display = 'block';
 
-    // Set today's date as default
     const today = new Date().toISOString().split('T')[0];
-    document.getElementById('dateInput').value = today;
+    dateInput.value = today;
 });
 
-
-document.getElementById('dateInput').addEventListener('change', () => {
-    const selectedDate = document.getElementById('dateInput').value;
+dateInput.addEventListener('change', () => {
+    const selectedDate = dateInput.value;
     if (selectedDate) {
         getMoonPhase(selectedDate);
     }
