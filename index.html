@@ -3,91 +3,215 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phase Lunaire Actuelle</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Phase Lunaire</title>
+    <meta name="description" content="La phase de la Lune jour après jour, les levers et couchers là où vous êtes, et les prochaines pleines lunes.">
+    <meta name="theme-color" content="#0a0e1c">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Phase Lunaire">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="icons/icon-192.png" type="image/png">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="preload" href="fonts/instrument-serif-400.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="fonts/instrument-sans-variable.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="images/moon-albedo.webp" as="image">
     <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-    <div class="constellation" id="constellation"></div>
+    <svg class="sprite" aria-hidden="true">
+        <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s7-6.2 7-11.5A7 7 0 0 0 5 9.5C5 14.800 12 21 12 21Z"/><circle cx="12" cy="9.500" r="2.400"/></symbol>
+        <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9.500 6 6 6-6"/></symbol>
+        <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m14.500 6-6 6 6 6"/></symbol>
+        <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9.500 6 6 6-6 6"/></symbol>
+        <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="4" y="5.500" width="16" height="15" rx="3"/><path d="M4 10.500h16M8.500 3.500v4M15.500 3.500v4"/></symbol>
+        <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.500"/><path d="m20 20-4.300-4.300"/></symbol>
+        <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+        <symbol id="i-locate" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.500"/><circle cx="12" cy="12" r="1.800"/><path d="M12 2.500v3M12 18.500v3M2.500 12h3M18.500 12h3"/></symbol>
+        <symbol id="i-map" viewBox="0 0 24 24"><path d="M9 4.500 3.500 6.500v13L9 17.500l6 2 5.500-2v-13L15 6.500l-6-2ZM9 4.500v13M15 6.500v13"/></symbol>
+        <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.500"/><path d="M12 7v5l3.500 2"/></symbol>
+        <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V6M6 12l6-6 6 6"/></symbol>
+        <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v13M6 12l6 6 6-6"/></symbol>
+    </svg>
 
-    <div class="container">
-        <h1>Phase Lunaire</h1>
-
-        <div class="date-controls">
-            <div class="date-input-group">
-                <button id="currentBtn" class="active">Aujourd'hui</button>
-                <button id="customBtn">Date personnalisée</button>
-            </div>
-            <div id="dateInputContainer" style="display: none;">
-                <input type="date" id="dateInput">
-            </div>
-
-            <!-- Location Controls -->
-            <button id="toggleLocationBtn" class="location-toggle-btn">
-                📍 Changer la Localisation
-            </button>
-
-            <div id="locationOptions" class="location-options" style="display: none;">
-                <h4>📍 Localisation</h4>
-                <div class="location-buttons">
-                    <button id="currentLocationBtn" class="location-btn">
-                        📍 Ma position
-                    </button>
-                    <button id="addressBtn" class="location-btn">
-                        🏠 Adresse
-                    </button>
-                    <button id="mapBtn" class="location-btn">
-                        🗺️ Carte
-                    </button>
-                </div>
-
-                <div id="addressInput" class="address-input" style="display: none;">
-                    <div class="address-input-row">
-                        <input type="text" id="addressField" placeholder="Entrez une adresse..." autocomplete="off">
-                        <button id="searchAddressBtn">Rechercher</button>
-                    </div>
-                    <div id="addressSuggestions" class="address-suggestions" style="display: none;"></div>
-                </div>
-
-                <div id="mapContainer"
-                    style="display: none; height: 300px; margin-top: 10px; border-radius: 8px; overflow: hidden;"></div>
-            </div>
-        </div>
-
-        <div class="date-display" id="dateDisplay"></div>
-        <div class="current-location" id="currentLocation"></div>
-        <div class="moon-container">
-            <img id="moonImage" src="" alt="Phase lunaire">
-        </div>
-        <div class="phase-name" id="phaseName"></div>
-        <div class="illumination-percent" id="illuminationPercent"></div>
-        <div class="sun-times" id="sunTimes">
-            <div class="sun-time sunrise">
-                <span class="label">🌅 Lever</span>
-                <span class="time" id="sunriseTime"></span>
-            </div>
-            <div class="sun-time sunset">
-                <span class="label">🌇 Coucher</span>
-                <span class="time" id="sunsetTime"></span>
-            </div>
-        </div>
-        <div class="sun-times" id="moonTimes">
-            <div class="sun-time moonrise">
-                <span class="label">🌙 Lever de lune</span>
-                <span class="time" id="moonriseTime"></span>
-            </div>
-            <div class="sun-time moonset">
-                <span class="label">🌙 Coucher de lune</span>
-                <span class="time" id="moonsetTime"></span>
-            </div>
-        </div>
-        <div class="times-note" id="timesNote"></div>
-        <div class="error" id="errorMessage"></div>
+    <div class="sky" aria-hidden="true">
+        <canvas id="stars"></canvas>
+        <canvas id="twinkles"></canvas>
     </div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Calculs astronomiques locaux : SunCalc 2 est un module ES, exposé en global pour script.js -->
+    <div class="app">
+        <header class="topbar">
+            <button id="placeButton" class="place-chip" type="button" aria-haspopup="dialog">
+                <svg class="icon"><use href="#i-pin"/></svg>
+                <span id="placeName" class="place-chip-name">Choisir un lieu</span>
+                <svg class="icon icon-small"><use href="#i-chevron-down"/></svg>
+            </button>
+            <button id="todayButton" class="today-chip" type="button" hidden>Aujourd’hui</button>
+        </header>
+
+        <main class="layout">
+            <section class="hero" aria-label="Lune du jour sélectionné">
+                <div id="moonStage" class="moon-stage">
+                    <div class="moon-glow"></div>
+                    <div class="moon-rotor">
+                        <canvas id="moon" role="img" aria-label="Lune"></canvas>
+                    </div>
+                </div>
+
+                <div class="hero-text">
+                    <label class="date-control">
+                        <svg class="icon icon-small"><use href="#i-calendar"/></svg>
+                        <span id="dateLabel"></span>
+                        <input id="datePicker" class="date-picker" type="date" min="1900-01-01" max="2100-12-31"
+                            aria-label="Aller à une date">
+                    </label>
+                    <h1 id="phaseName" class="phase-name">&nbsp;</h1>
+                    <dl class="stats">
+                        <div>
+                            <dt>Éclairée</dt>
+                            <dd id="illuminationValue">–</dd>
+                        </div>
+                        <div>
+                            <dt>Âge</dt>
+                            <dd id="ageValue">–</dd>
+                        </div>
+                        <div>
+                            <dt>Distance</dt>
+                            <dd id="distanceValue">–</dd>
+                        </div>
+                    </dl>
+                </div>
+
+                <div id="errorMessage" class="error" role="alert" hidden></div>
+
+                <nav class="dock" aria-label="Choisir un jour">
+                    <button id="previousDay" class="dock-arrow" type="button" aria-label="Jour précédent">
+                        <svg class="icon"><use href="#i-chevron-left"/></svg>
+                    </button>
+                    <div class="strip-frame">
+                        <div id="strip" class="strip"></div>
+                    </div>
+                    <button id="nextDay" class="dock-arrow" type="button" aria-label="Jour suivant">
+                        <svg class="icon"><use href="#i-chevron-right"/></svg>
+                    </button>
+                </nav>
+            </section>
+
+            <div class="panels">
+                <section class="panel" aria-labelledby="skyTitle">
+                    <h2 id="skyTitle" class="panel-title">Dans le ciel</h2>
+
+                    <div id="skyEmpty" class="sky-empty">
+                        <p>Choisissez un lieu pour savoir quand la Lune et le Soleil se lèvent et se couchent.</p>
+                        <button id="skyPlaceButton" class="primary-button" type="button">
+                            <svg class="icon"><use href="#i-pin"/></svg>
+                            Choisir un lieu
+                        </button>
+                    </div>
+
+                    <div id="skyContent" hidden>
+                        <p id="visibility" class="visibility"></p>
+                        <div class="sky-rows">
+                            <div class="sky-row sky-row-moon">
+                                <span class="sky-name">Lune</span>
+                                <span id="moonTimes" class="sky-times"></span>
+                            </div>
+                            <div class="sky-row sky-row-sun">
+                                <span class="sky-name">Soleil</span>
+                                <span id="sunTimes" class="sky-times"></span>
+                            </div>
+                        </div>
+                        <p id="timeZoneNote" class="note"></p>
+                    </div>
+                </section>
+
+                <section class="panel" aria-labelledby="phasesTitle">
+                    <h2 id="phasesTitle" class="panel-title">Prochaines phases</h2>
+                    <ol id="nextPhases" class="next-phases"></ol>
+                </section>
+
+                <section class="panel" aria-labelledby="calendarTitle">
+                    <div class="panel-heading">
+                        <h2 id="calendarTitle" class="panel-title">Calendrier</h2>
+                        <div class="month-nav">
+                            <button id="previousMonth" class="icon-button" type="button" aria-label="Mois précédent">
+                                <svg class="icon"><use href="#i-chevron-left"/></svg>
+                            </button>
+                            <span id="monthLabel" class="month-label" aria-live="polite"></span>
+                            <button id="nextMonth" class="icon-button" type="button" aria-label="Mois suivant">
+                                <svg class="icon"><use href="#i-chevron-right"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="weekdays" aria-hidden="true">
+                        <span>L</span><span>M</span><span>M</span><span>J</span><span>V</span><span>S</span><span>D</span>
+                    </div>
+                    <div id="calendar" class="calendar"></div>
+                </section>
+
+                <footer class="credits">
+                    <p>Tout est calculé sur votre appareil avec
+                        <a href="https://github.com/mourner/suncalc" rel="noopener">SunCalc</a>.
+                        Image de la Lune : NASA’s Scientific Visualization Studio.
+                        Recherche de lieux :
+                        <a href="https://photon.komoot.io" rel="noopener">Photon</a>,
+                        © contributeurs <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a>.
+                    </p>
+                </footer>
+            </div>
+        </main>
+    </div>
+
+    <dialog id="placeDialog" class="sheet" aria-labelledby="placeDialogTitle">
+        <div class="sheet-head">
+            <h2 id="placeDialogTitle" class="sheet-title">Choisir un lieu</h2>
+            <button id="closePlaceDialog" class="icon-button" type="button" aria-label="Fermer">
+                <svg class="icon"><use href="#i-close"/></svg>
+            </button>
+        </div>
+
+        <form id="searchForm" class="search" role="search">
+            <svg class="icon"><use href="#i-search"/></svg>
+            <input id="searchField" type="search" placeholder="Ville, adresse…" autocomplete="off"
+                enterkeyhint="search" aria-label="Rechercher un lieu">
+        </form>
+
+        <div class="sheet-body">
+            <ul id="searchResults" class="place-list" hidden></ul>
+            <p id="searchStatus" class="sheet-status" role="status" hidden></p>
+
+            <div id="placeActions">
+                <ul class="place-list">
+                    <li>
+                        <button id="locateButton" class="place-row" type="button">
+                            <svg class="icon"><use href="#i-locate"/></svg>
+                            <span class="place-row-text"><span class="place-row-main">Ma position</span></span>
+                        </button>
+                    </li>
+                    <li>
+                        <button id="mapButton" class="place-row" type="button" aria-expanded="false">
+                            <svg class="icon"><use href="#i-map"/></svg>
+                            <span class="place-row-text"><span class="place-row-main">Choisir sur la carte</span></span>
+                        </button>
+                    </li>
+                </ul>
+                <div id="mapContainer" class="map" hidden></div>
+
+                <div id="recentPlaces" hidden>
+                    <h3 class="sheet-subtitle">Récents</h3>
+                    <ul id="recentList" class="place-list"></ul>
+                </div>
+
+                <button id="forgetPlace" class="text-button" type="button" hidden>Oublier ce lieu</button>
+            </div>
+        </div>
+    </dialog>
+
+    <div id="liveStatus" class="visually-hidden" role="status"></div>
+
+    <!-- Calculs astronomiques : SunCalc 2 est un module ES, exposé en global pour script.js -->
     <script type="importmap">
         {
             "imports": {
@@ -106,6 +230,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@photostructure/tz-lookup@11.7.0/tz.js"
         integrity="sha384-pcNp83JCLtH2AjMn2L88ZP852oNdQA2RNmIOWED8WgkU0Kr6rkTMXunp+nlDnWGn"
         crossorigin="anonymous"></script>
+    <script src="moon.js"></script>
     <script src="script.js"></script>
 </body>
 
