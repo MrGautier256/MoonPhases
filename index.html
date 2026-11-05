@@ -55,7 +55,6 @@
             </div>
         </div>
 
-        <div class="loader" id="loader"></div>
         <div class="date-display" id="dateDisplay"></div>
         <div class="current-location" id="currentLocation"></div>
         <div class="moon-container">
@@ -63,7 +62,7 @@
         </div>
         <div class="phase-name" id="phaseName"></div>
         <div class="illumination-percent" id="illuminationPercent"></div>
-        <div class="sun-times">
+        <div class="sun-times" id="sunTimes">
             <div class="sun-time sunrise">
                 <span class="label">🌅 Lever</span>
                 <span class="time" id="sunriseTime"></span>
@@ -73,10 +72,40 @@
                 <span class="time" id="sunsetTime"></span>
             </div>
         </div>
+        <div class="sun-times" id="moonTimes">
+            <div class="sun-time moonrise">
+                <span class="label">🌙 Lever de lune</span>
+                <span class="time" id="moonriseTime"></span>
+            </div>
+            <div class="sun-time moonset">
+                <span class="label">🌙 Coucher de lune</span>
+                <span class="time" id="moonsetTime"></span>
+            </div>
+        </div>
+        <div class="times-note" id="timesNote"></div>
         <div class="error" id="errorMessage"></div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Calculs astronomiques locaux : SunCalc 2 est un module ES, exposé en global pour script.js -->
+    <script type="importmap">
+        {
+            "imports": {
+                "suncalc": "https://cdn.jsdelivr.net/npm/suncalc@2.1.2/index.js"
+            },
+            "integrity": {
+                "https://cdn.jsdelivr.net/npm/suncalc@2.1.2/index.js": "sha384-DIbjw2enV9Gi/6Zlrend7FvgQyWMwUQaEzEcOiZ2UnmOBVe58YYrSpTibglBfQ7V"
+            }
+        }
+    </script>
+    <script type="module">
+        import * as SunCalc from 'suncalc';
+        window.SunCalc = SunCalc;
+    </script>
+    <!-- Fuseau horaire à partir des coordonnées -->
+    <script src="https://cdn.jsdelivr.net/npm/@photostructure/tz-lookup@11.7.0/tz.js"
+        integrity="sha384-pcNp83JCLtH2AjMn2L88ZP852oNdQA2RNmIOWED8WgkU0Kr6rkTMXunp+nlDnWGn"
+        crossorigin="anonymous"></script>
     <script src="script.js"></script>
 </body>
 

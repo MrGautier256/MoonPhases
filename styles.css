@@ -280,17 +280,6 @@
         text-shadow: 0 0 10px rgba(243, 156, 18, 0.5);
     }
 
-    .loader {
-        width: 50px;
-        height: 50px;
-        border: 5px solid #f3f3f3;
-        border-top: 5px solid #3498db;
-        border-radius: 50%;
-        margin: 20px auto;
-        display: none;
-        animation: spin 1s linear infinite;
-    }
-
     .illumination-percent {
         font-size: 1.4rem;
         margin: 0.5rem 0;
@@ -333,16 +322,21 @@
         color: #ffa07a;
     }
 
+    .moonrise .time,
+    .moonset .time {
+        color: #d0d0ff;
+    }
+
+    .times-note {
+        font-size: 0.95rem;
+        margin: 1rem 0;
+        color: rgba(255, 255, 255, 0.75);
+    }
+
     .error {
         color: #ff4d4d;
         display: none;
         margin: 1rem 0;
-    }
-
-    @keyframes spin {
-        to {
-            transform: rotate(360deg);
-        }
     }
 
     @keyframes twinkle {
