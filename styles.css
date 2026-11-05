@@ -1,14 +1,7 @@
 @font-face {
-    font-family: 'Instrument Serif';
-    src: url('fonts/instrument-serif-400.woff2') format('woff2');
-    font-weight: 400;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Instrument Sans';
-    src: url('fonts/instrument-sans-variable.woff2') format('woff2');
-    font-weight: 400 700;
+    font-family: 'Fredoka';
+    src: url('fonts/fredoka-variable.woff2') format('woff2');
+    font-weight: 300 700;
     font-display: swap;
 }
 
@@ -27,8 +20,8 @@
     --moonlight: #c9d4ee;
     --danger: #ffa49a;
 
-    --serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
-    --sans: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --display: 'Fredoka', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --body: 'Fredoka', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 
     --cell: 54px;
     --dock-height: 84px;
@@ -57,7 +50,7 @@ body {
     margin: 0;
     min-height: 100svh;
     overflow-x: clip;
-    font-family: var(--sans);
+    font-family: var(--body);
     font-size: 1rem;
     line-height: 1.45;
     color: var(--text);
@@ -409,11 +402,11 @@ a {
 }
 
 .phase-name {
-    font-family: var(--serif);
-    font-size: clamp(2.5rem, 11.5vw, 3.25rem);
-    font-weight: 400;
-    line-height: 1.08;
-    letter-spacing: -0.005em;
+    font-family: var(--display);
+    /* Calé sur la largeur de « Gibbeuse Décroissante », le nom le plus long, pour tenir sur une ligne. */
+    font-size: min(calc((100vw - 36px) / 10.4), 3rem);
+    font-weight: 600;
+    line-height: 1.15;
     color: var(--moon);
 }
 
@@ -608,9 +601,9 @@ a {
 }
 
 .panel-title {
-    font-family: var(--serif);
-    font-size: 1.625rem;
-    font-weight: 400;
+    font-family: var(--display);
+    font-size: 1.375rem;
+    font-weight: 600;
     line-height: 1.15;
 }
 
@@ -695,10 +688,13 @@ a {
     font-variant-numeric: tabular-nums;
 }
 
+/* Largeur fixe : les chiffres de la police n'ont pas tous la même largeur. */
 .sky-time {
     display: inline-flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 3px;
+    min-width: 4em;
 }
 
 .sky-time .icon {
@@ -900,9 +896,9 @@ a {
 }
 
 .sheet-title {
-    font-family: var(--serif);
-    font-size: 1.75rem;
-    font-weight: 400;
+    font-family: var(--display);
+    font-size: 1.5rem;
+    font-weight: 600;
 }
 
 .search {
@@ -1098,7 +1094,7 @@ a {
     }
 
     .phase-name {
-        font-size: 4rem;
+        font-size: clamp(2rem, 3.6vw, 3.5rem);
     }
 
     .stats {
