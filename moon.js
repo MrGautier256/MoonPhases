@@ -1,5 +1,7 @@
-// Rendu de la Lune : une vraie carte du disque visible (NASA), éclairée pixel par pixel
-// selon la phase. Les images sont orientées nord en haut, comme vues de l'hémisphère nord.
+// Rendu de la Lune, en deux versions qui suivent le même modèle : phase et inclinaison réelles.
+// Réaliste : une vraie carte du disque visible (NASA), éclairée pixel par pixel.
+// Dessinée : un dessin vectoriel, avec une ombre découpée selon la phase et des cratères qui suivent le Soleil.
+// Les deux sont orientées nord en haut, comme vues de l'hémisphère nord.
 const MoonRenderer = (() => {
     const MAX_SIZE = 720;
     const MIN_SIZE = 360;
@@ -121,5 +123,75 @@ const MoonRenderer = (() => {
         return { ready, draw };
     }
 
-    return { create };
+    // Le dessin de la Lune, avec par-dessus la nuit et une bande de pénombre, découpées selon la phase.
+    function createCartoon(svg) {
+        const surface = svg.querySelector('#moonSurface');
+        const dusk = svg.querySelector('#moonDusk');
+        const night = svg.querySelector('#moonNight');
+        const NIGHT_EDGE = 1.004; // déborde du disque pour couvrir le liseré clair du bord
+        const DUSK_WIDTH = 0.09;
+        const RELIEF = 0.1; // décalage des ombres d'un cratère, en part de son rayon
+
+        function addShape(tag, className, attributes) {
+            const shape = document.createElementNS('http://www.w3.org/2000/svg', tag);
+            shape.setAttribute('class', className);
+            Object.entries(attributes).forEach(([name, value]) => shape.setAttribute(name, value));
+            surface.append(shape);
+            return shape;
+        }
+
+        MOON_DRAWING.maria.forEach((d) => addShape('path', 'cartoon-mare', { d }));
+        MOON_DRAWING.rays.forEach((d) => addShape('path', 'cartoon-ray', { d }));
+
+        MOON_DRAWING.pits.forEach(([x, y, rx, ry, angle]) => {
+            const transform = `translate(${x} ${y}) rotate(${angle})`;
+            addShape('ellipse', 'cartoon-pit-wall', { rx, ry, transform });
+            addShape('ellipse', 'cartoon-pit-floor', { rx: rx * 0.72, ry: ry * 0.72, transform: `${transform} translate(${rx * 0.12} ${ry * 0.12})` });
+        });
+
+        const craters = MOON_DRAWING.craters.map(([x, y, rx, ry, angle]) => {
+            const rim = addShape('ellipse', 'cartoon-rim', { rx: rx * 1.1, ry: ry * 1.1 });
+            addShape('ellipse', 'cartoon-wall', { rx, ry, transform: `translate(${x} ${y}) rotate(${angle})` });
+            const floor = addShape('ellipse', 'cartoon-floor', { rx: rx * 0.84, ry: ry * 0.84 });
+            return { x, y, angle, rim, floor, reach: Math.min(rx, ry) * RELIEF };
+        });
+
+        // Zone sombre : du limbe opposé au Soleil jusqu'à la frontière jour/nuit, tracée limbe éclairé à droite.
+        function shadowPath(terminator) {
+            const edge = NIGHT_EDGE;
+            const sweep = terminator > 0 ? 0 : 1;
+            return `M0-${edge}A${edge} ${edge} 0 0 0 0 ${edge}A${Math.abs(terminator).toFixed(4)} ${edge} 0 0 ${sweep} 0-${edge}Z`;
+        }
+
+        // Même `fraction` et même `angle` que pour la version réaliste.
+        function draw({ fraction, angle }) {
+            const limb = angle * Math.PI / 180;
+            const rotation = Math.atan2(-Math.cos(limb), -Math.sin(limb)) * 180 / Math.PI;
+            const placement = `translate(1000 1000) scale(1000) rotate(${rotation.toFixed(2)})`;
+
+            // Frontière sur l'équateur de la Lune : -1 à la pleine lune, +1 à la nouvelle lune.
+            const terminator = 1 - 2 * fraction;
+            const duskEdge = Math.min(1, terminator + DUSK_WIDTH * (1 - terminator * terminator));
+            night.setAttribute('d', shadowPath(terminator));
+            night.setAttribute('transform', placement);
+            dusk.setAttribute('d', shadowPath(duskEdge));
+            dusk.setAttribute('transform', placement);
+
+            // Le Soleil éclaire le rebord tourné vers lui et laisse dans l'ombre la paroi de ce côté :
+            // à la pleine lune il est de face, et les cratères n'ont plus d'ombre.
+            const sinIncidence = 2 * Math.sqrt(fraction * (1 - fraction));
+            const sunX = -Math.sin(limb) * sinIncidence;
+            const sunY = -Math.cos(limb) * sinIncidence;
+            craters.forEach(({ x, y, angle: tilt, rim, floor, reach }) => {
+                const dx = sunX * reach;
+                const dy = sunY * reach;
+                rim.setAttribute('transform', `translate(${(x + dx).toFixed(1)} ${(y + dy).toFixed(1)}) rotate(${tilt})`);
+                floor.setAttribute('transform', `translate(${(x - dx).toFixed(1)} ${(y - dy).toFixed(1)}) rotate(${tilt})`);
+            });
+        }
+
+        return { ready: Promise.resolve(), draw };
+    }
+
+    return { create, createCartoon };
 })();

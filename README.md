@@ -2,7 +2,7 @@
 
 Site statique (HTML, CSS, JavaScript, sans étape de build), pensé d'abord pour le téléphone, qui montre la Lune telle qu'elle est jour après jour :
 
-- la Lune elle-même, éclairée selon sa phase réelle, à faire défiler d'un glissement du doigt ;
+- la Lune elle-même, dessinée ou réaliste, éclairée selon sa phase réelle, à faire défiler d'un glissement du doigt ;
 - quand la voir cette nuit, avec les levers et couchers de la Lune et du Soleil là où vous êtes ;
 - les prochaines phases, avec leur heure exacte, et un calendrier lunaire ;
 - le dernier lieu choisi, mémorisé sur l'appareil uniquement.
@@ -25,7 +25,7 @@ Données cartographiques et d'adresses © les contributeurs OpenStreetMap.
 
 ## Images et polices
 
-`moon.js` éclaire pixel par pixel deux images précalculées à partir du [CGI Moon Kit](https://svs.gsfc.nasa.gov/4720) de NASA's Scientific Visualization Studio (`lroc_color_poles_4k` et `ldem_16`), projetées sur le disque visible depuis la Terre, nord en haut : `images/moon-albedo.webp` pour la surface, `images/moon-relief.webp` pour les cratères le long de la frontière jour/nuit.
+`moon.js` affiche la Lune en deux versions, qui suivent la même phase et la même inclinaison. La version dessinée, affichée par défaut, part du dessin vectoriel de `moon-drawing.js`, y découpe l'ombre selon la phase et déplace les ombres des cratères avec le Soleil. La version réaliste, chargée seulement à la demande, éclaire pixel par pixel deux images précalculées à partir du [CGI Moon Kit](https://svs.gsfc.nasa.gov/4720) de NASA's Scientific Visualization Studio (`lroc_color_poles_4k` et `ldem_16`), projetées sur le disque visible depuis la Terre, nord en haut : `images/moon-albedo.webp` pour la surface, `images/moon-relief.webp` pour les cratères le long de la frontière jour/nuit.
 
 Les polices [Instrument Serif](https://fonts.google.com/specimen/Instrument+Serif) et [Instrument Sans](https://fonts.google.com/specimen/Instrument+Sans) sont hébergées dans `fonts/`, sous licence SIL Open Font License.
 

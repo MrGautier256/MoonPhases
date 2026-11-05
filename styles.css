@@ -286,16 +286,79 @@ a {
     rotate: 180deg;
 }
 
-#moon {
+#moon,
+.moon-cartoon {
+    position: absolute;
+    inset: 0;
     display: block;
     width: 100%;
     height: 100%;
     opacity: 0;
-    transition: opacity 0.9s ease;
+    transition: opacity 0.7s ease;
 }
 
-.is-ready #moon {
+[data-moon-style='real'] .is-ready #moon,
+[data-moon-style='cartoon'] .is-ready .moon-cartoon {
     opacity: 1;
+}
+
+.cartoon-surface {
+    fill: #e6e7e8;
+}
+
+.cartoon-mare {
+    fill: #d5d7db;
+}
+
+.cartoon-ray {
+    fill: #f2f3f4;
+}
+
+.cartoon-rim {
+    fill: #f4f5f6;
+}
+
+.cartoon-wall {
+    fill: #a6a8ad;
+}
+
+.cartoon-floor {
+    fill: #bcbec0;
+}
+
+.cartoon-pit-wall {
+    fill: #b0b2b7;
+}
+
+.cartoon-pit-floor {
+    fill: #c8cacd;
+}
+
+.cartoon-dusk {
+    fill: #231f20;
+    opacity: 0.34;
+}
+
+.cartoon-night {
+    fill: #231f20;
+    opacity: 0.85;
+}
+
+/* Dans le coin du carré, là où le disque de la Lune ne passe pas. */
+.moon-style-button {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    color: var(--muted);
+    background: rgba(17, 22, 39, 0.7);
+    transition: color 0.2s;
 }
 
 .hero-text {
@@ -988,6 +1051,7 @@ a {
     }
 
     .icon-button:hover,
+    .moon-style-button:hover,
     .dock-arrow:hover,
     .date-control:hover,
     .day:hover {

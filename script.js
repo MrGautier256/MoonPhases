@@ -37,6 +37,7 @@ const LEAFLET = {
 
 const STORAGE_PLACE = 'moonphases.place';
 const STORAGE_RECENT = 'moonphases.recent';
+const STORAGE_MOON_STYLE = 'moonphases.moonStyle';
 const MAX_RECENT_PLACES = 4;
 
 // La bande compte STRIP_RANGE jours de chaque côté, et se recentre près de ses bords.
@@ -58,7 +59,12 @@ const state = {
     month: null
 };
 const strip = { element: $('strip'), start: null, startNoon: 0, cell: 54, current: null };
-const moon = MoonRenderer.create($('moon'));
+// La Lune réaliste et ses images ne sont chargées que si on la demande.
+const moonViews = {
+    cartoon: MoonRenderer.createCartoon($('cartoonMoon')),
+    real: null
+};
+let moonStyle = 'cartoon';
 
 let previewFrame = 0;
 let commitTimer = 0;
@@ -255,13 +261,39 @@ function createIcon(name) {
 
 // Affichage de la Lune
 
+function getMoonView(style) {
+    if (!moonViews[style]) moonViews[style] = MoonRenderer.create($('moon'));
+    return moonViews[style];
+}
+
+function applyMoonStyle(style) {
+    moonStyle = style;
+    const label = style === 'cartoon' ? 'Voir la Lune réaliste' : 'Voir la Lune dessinée';
+    $('moonStyleButton').setAttribute('aria-label', label);
+    $('moonStyleButton').title = label;
+
+    // L'ancienne version reste affichée tant que la nouvelle n'est pas prête.
+    getMoonView(style).ready.then(() => {
+        if (moonStyle !== style) return;
+        document.documentElement.dataset.moonStyle = style;
+        renderHero(instantFor(state.day), state.day);
+        $('moonStage').classList.add('is-ready');
+    });
+}
+
+function toggleMoonStyle() {
+    const style = moonStyle === 'cartoon' ? 'real' : 'cartoon';
+    writeStorage(STORAGE_MOON_STYLE, style);
+    applyMoonStyle(style);
+}
+
 function renderHero(instant, day) {
     const illumination = SunCalc.getMoonIllumination(instant);
     const percent = Math.round(illumination.fraction * 100);
     const key = getPhaseKey(illumination.phase);
     const distance = SunCalc.getMoonPosition(instant, 0, 0).distance;
 
-    moon.draw(illumination);
+    getMoonView(moonStyle).draw(illumination);
 
     const stage = $('moonStage');
     const limb = illumination.angle * Math.PI / 180;
@@ -286,7 +318,7 @@ function renderDay() {
     const { key, percent } = renderHero(instantFor(state.day), state.day);
     const description = `${PHASE_NAMES[key]}, ${percent} % éclairée`;
 
-    $('moon').setAttribute('aria-label', description);
+    $('moonView').setAttribute('aria-label', description);
     $('liveStatus').textContent = `${formatDay(state.day, 'long')}. ${description}.`;
     $('todayButton').hidden = state.day === state.today;
     $('datePicker').value = state.day;
@@ -1026,6 +1058,7 @@ function bindEvents() {
     stage.addEventListener('pointermove', onMoonPointerMove);
     stage.addEventListener('pointerup', onMoonPointerUp);
     stage.addEventListener('pointercancel', onMoonPointerUp);
+    $('moonStyleButton').addEventListener('click', toggleMoonStyle);
 
     $('previousDay').addEventListener('click', () => goToDay(addDays(state.day, -1)));
     $('nextDay').addEventListener('click', () => goToDay(addDays(state.day, 1)));
@@ -1089,15 +1122,12 @@ function start() {
     }
 
     const savedPlace = readStorage(STORAGE_PLACE, null);
+    moonStyle = readStorage(STORAGE_MOON_STYLE, 'cartoon') === 'real' ? 'real' : 'cartoon';
     state.today = toLocalDay(new Date());
     state.day = state.today;
     bindEvents();
     applyPlace(isValidPlace(savedPlace) ? savedPlace : null);
-
-    moon.ready.then(() => {
-        renderHero(instantFor(state.day), state.day);
-        $('moonStage').classList.add('is-ready');
-    });
+    applyMoonStyle(moonStyle);
 }
 
 document.addEventListener('DOMContentLoaded', start);

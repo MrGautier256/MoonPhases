@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-moon-style="cartoon">
 
 <head>
     <meta charset="UTF-8">
@@ -16,7 +16,6 @@
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
     <link rel="preload" href="fonts/instrument-serif-400.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="fonts/instrument-sans-variable.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="images/moon-albedo.webp" as="image">
     <link rel="stylesheet" href="styles.css">
 </head>
 
@@ -34,6 +33,7 @@
         <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.500"/><path d="M12 7v5l3.500 2"/></symbol>
         <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 19V6M6 12l6-6 6 6"/></symbol>
         <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v13M6 12l6 6 6-6"/></symbol>
+        <symbol id="i-style" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 1 0 16Z" fill="currentColor" stroke="none"/></symbol>
     </svg>
 
     <div class="sky" aria-hidden="true">
@@ -55,9 +55,28 @@
             <section class="hero" aria-label="Lune du jour sélectionné">
                 <div id="moonStage" class="moon-stage">
                     <div class="moon-glow"></div>
-                    <div class="moon-rotor">
-                        <canvas id="moon" role="img" aria-label="Lune"></canvas>
+                    <div id="moonView" class="moon-rotor" role="img" aria-label="Lune">
+                        <canvas id="moon" aria-hidden="true"></canvas>
+                        <svg id="cartoonMoon" class="moon-cartoon" viewBox="-6 -6 2012 2012" aria-hidden="true">
+                            <defs>
+                                <clipPath id="moonDisc">
+                                    <circle cx="1000" cy="1000" r="1000"/>
+                                </clipPath>
+                                <radialGradient id="moonVolume">
+                                    <stop offset="0.62" stop-color="#5a5f6e" stop-opacity="0"/>
+                                    <stop offset="1" stop-color="#5a5f6e" stop-opacity="0.26"/>
+                                </radialGradient>
+                            </defs>
+                            <circle class="cartoon-surface" cx="1000" cy="1000" r="1000"/>
+                            <g id="moonSurface" clip-path="url(#moonDisc)"></g>
+                            <circle cx="1000" cy="1000" r="1000" fill="url(#moonVolume)"/>
+                            <path id="moonDusk" class="cartoon-dusk"/>
+                            <path id="moonNight" class="cartoon-night"/>
+                        </svg>
                     </div>
+                    <button id="moonStyleButton" class="moon-style-button" type="button">
+                        <svg class="icon"><use href="#i-style"/></svg>
+                    </button>
                 </div>
 
                 <div class="hero-text">
@@ -154,7 +173,7 @@
                 <footer class="credits">
                     <p>Tout est calculé sur votre appareil avec
                         <a href="https://github.com/mourner/suncalc" rel="noopener">SunCalc</a>.
-                        Image de la Lune : NASA’s Scientific Visualization Studio.
+                        Lune réaliste : NASA’s Scientific Visualization Studio.
                         Recherche de lieux :
                         <a href="https://photon.komoot.io" rel="noopener">Photon</a>,
                         © contributeurs <a href="https://www.openstreetmap.org/copyright" rel="noopener">OpenStreetMap</a>.
@@ -230,6 +249,7 @@
     <script src="https://cdn.jsdelivr.net/npm/@photostructure/tz-lookup@11.7.0/tz.js"
         integrity="sha384-pcNp83JCLtH2AjMn2L88ZP852oNdQA2RNmIOWED8WgkU0Kr6rkTMXunp+nlDnWGn"
         crossorigin="anonymous"></script>
+    <script src="moon-drawing.js"></script>
     <script src="moon.js"></script>
     <script src="script.js"></script>
 </body>
