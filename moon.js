@@ -5,7 +5,7 @@
 const MoonRenderer = (() => {
     const MAX_SIZE = 720;
     const MIN_SIZE = 360;
-    const RELIEF_SCALE = 0.45; // valeur utilisée au précalcul de images/moon-relief.webp
+    const RELIEF_SCALE = 0.45; // valeur utilisée au précalcul de l'image de relief
     const LIGHT_STEPS = 1024;
 
     // Teinte de la lumière du Soleil et de la lumière cendrée renvoyée par la Terre.
@@ -19,6 +19,17 @@ const MoonRenderer = (() => {
     const LIGHT_CURVE = new Float32Array(LIGHT_STEPS + 1);
     for (let i = 0; i <= LIGHT_STEPS; i++) {
         LIGHT_CURVE[i] = Math.min(1, 2 * i / LIGHT_STEPS) ** 0.75;
+    }
+
+    // Les images de la Lune réaliste sont lourdes : leur fichier n'est chargé que si on la demande.
+    function loadScript(src) {
+        return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = resolve;
+            script.onerror = () => reject(new Error(`${src} indisponible`));
+            document.head.append(script);
+        });
     }
 
     function loadImage(src) {
@@ -77,7 +88,8 @@ const MoonRenderer = (() => {
             pixels[offsets[i] * 4 + 3] = Math.max(0, Math.min(1, (1 - Math.sqrt(px * px + py * py)) * radius + 0.5)) * 255;
         }
 
-        const ready = Promise.all([loadImage('images/moon-albedo.webp'), loadImage('images/moon-relief.webp')])
+        const ready = loadScript('moon-textures.js')
+            .then(() => Promise.all([loadImage(MOON_TEXTURES.albedo), loadImage(MOON_TEXTURES.relief)]))
             .then(([albedoImage, reliefImage]) => {
                 const albedoPixels = readPixels(albedoImage, size, size);
                 const reliefPixels = readPixels(reliefImage, size * 2, size);
@@ -88,10 +100,6 @@ const MoonRenderer = (() => {
                     reliefX[i] = (reliefPixels[(y * size * 2 + x) * 4] - 127.5) / 127.5 * RELIEF_SCALE;
                     reliefY[i] = (reliefPixels[(y * size * 2 + x + size) * 4] - 127.5) / 127.5 * RELIEF_SCALE;
                 }
-            })
-            .catch((error) => {
-                // Sans les images, le disque reste juste : seule la texture manque.
-                console.warn('Images de la Lune indisponibles:', error);
             });
 
         // `fraction` et `angle` viennent de SunCalc.getMoonIllumination : `angle` est la position

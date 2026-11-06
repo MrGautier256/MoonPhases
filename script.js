@@ -278,12 +278,20 @@ function applyMoonStyle(style) {
         document.documentElement.dataset.moonStyle = style;
         renderHero(instantFor(state.day), state.day);
         $('moonStage').classList.add('is-ready');
+    }).catch((error) => {
+        // Sans ses images, la Lune réaliste serait un disque lisse : on garde le dessin.
+        console.warn('Lune réaliste indisponible:', error);
+        moonViews[style] = null;
+        applyMoonStyle('cartoon');
+        $('errorMessage').textContent = 'La Lune réaliste n’a pas pu être chargée. Vérifiez votre connexion, puis réessayez.';
+        $('errorMessage').hidden = false;
     });
 }
 
 function toggleMoonStyle() {
     const style = moonStyle === 'cartoon' ? 'real' : 'cartoon';
     writeStorage(STORAGE_MOON_STYLE, style);
+    $('errorMessage').hidden = true;
     applyMoonStyle(style);
 }
 
