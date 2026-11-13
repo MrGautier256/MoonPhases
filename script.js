@@ -987,7 +987,7 @@ async function toggleMap() {
 
     if (!map) {
         map = L.map(container).setView([46.603354, 1.888334], 5);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© contributeurs OpenStreetMap'
         }).addTo(map);
         map.attributionControl.setPrefix('Leaflet');
