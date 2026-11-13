@@ -14,12 +14,16 @@ Toutes les données astronomiques sont calculées directement dans le navigateur
 - [SunCalc](https://github.com/mourner/suncalc) (v2.1.2) pour la phase, l'illumination, les positions et les heures de lever et de coucher ;
 - [@photostructure/tz-lookup](https://github.com/photostructure/tz-lookup) (v11.7.0) pour déterminer le fuseau horaire du lieu, afin d'afficher les heures à l'heure locale de ce lieu.
 
-Ces deux bibliothèques sont chargées depuis jsDelivr avec une version figée et une empreinte d'intégrité (SRI).
+Ces bibliothèques sont embarquées dans `vendor/`, dans leur version publiée sur npm, avec leur licence :
+
+- `vendor/suncalc-2.1.2/` : SunCalc, licence BSD 2 clauses (version script classique du paquet, `suncalc.cjs`, renommée en `.js`) ;
+- `vendor/tz-lookup-11.7.0/` : tz-lookup, licence CC0 ;
+- `vendor/leaflet-1.9.4/` : [Leaflet](https://leafletjs.com), pour la carte, licence BSD 2 clauses.
 
 Services externes restants, tous gratuits et sans clé :
 
 - [Photon](https://photon.komoot.io) pour la recherche de lieux et le nom d'une position (coordonnées arrondies à environ 1 km) ;
-- [Leaflet](https://leafletjs.com) et les tuiles [OpenStreetMap](https://www.openstreetmap.org/copyright), chargés seulement à l'ouverture de la carte.
+- les tuiles [OpenStreetMap](https://www.openstreetmap.org/copyright), chargées seulement à l'ouverture de la carte.
 
 Données cartographiques et d'adresses © les contributeurs OpenStreetMap.
 

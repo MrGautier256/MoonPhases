@@ -228,25 +228,10 @@
 
     <div id="liveStatus" class="visually-hidden" role="status"></div>
 
-    <!-- Calculs astronomiques : SunCalc 2 est un module ES, exposé en global pour script.js -->
-    <script type="importmap">
-        {
-            "imports": {
-                "suncalc": "https://cdn.jsdelivr.net/npm/suncalc@2.1.2/index.js"
-            },
-            "integrity": {
-                "https://cdn.jsdelivr.net/npm/suncalc@2.1.2/index.js": "sha384-DIbjw2enV9Gi/6Zlrend7FvgQyWMwUQaEzEcOiZ2UnmOBVe58YYrSpTibglBfQ7V"
-            }
-        }
-    </script>
-    <script type="module">
-        import * as SunCalc from 'suncalc';
-        window.SunCalc = SunCalc;
-    </script>
-    <!-- Fuseau horaire à partir des coordonnées -->
-    <script src="https://cdn.jsdelivr.net/npm/@photostructure/tz-lookup@11.7.0/tz.js"
-        integrity="sha384-pcNp83JCLtH2AjMn2L88ZP852oNdQA2RNmIOWED8WgkU0Kr6rkTMXunp+nlDnWGn"
-        crossorigin="anonymous"></script>
+    <!-- Bibliothèques embarquées (voir README) : calculs astronomiques, puis fuseau horaire à partir des
+         coordonnées. Des scripts classiques, et non des modules, pour que la page marche aussi ouverte sans serveur. -->
+    <script src="vendor/suncalc-2.1.2/suncalc.js"></script>
+    <script src="vendor/tz-lookup-11.7.0/tz.js"></script>
     <script src="moon-drawing.js"></script>
     <script src="moon.js"></script>
     <script src="script.js"></script>

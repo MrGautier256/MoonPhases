@@ -28,11 +28,10 @@ const RISE_ALTITUDE = -0.27;
 
 const BROWSER_TIME_ZONE = Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
 const PHOTON_URL = 'https://photon.komoot.io';
+// Leaflet est embarqué, mais chargé seulement à l'ouverture de la carte.
 const LEAFLET = {
-    script: 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
-    scriptIntegrity: 'sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH',
-    style: 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
-    styleIntegrity: 'sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H'
+    script: 'vendor/leaflet-1.9.4/leaflet.js',
+    style: 'vendor/leaflet-1.9.4/leaflet.css'
 };
 
 const STORAGE_PLACE = 'moonphases.place';
@@ -943,13 +942,9 @@ function loadLeaflet() {
             const style = document.createElement('link');
             style.rel = 'stylesheet';
             style.href = LEAFLET.style;
-            style.integrity = LEAFLET.styleIntegrity;
-            style.crossOrigin = 'anonymous';
 
             const script = document.createElement('script');
             script.src = LEAFLET.script;
-            script.integrity = LEAFLET.scriptIntegrity;
-            script.crossOrigin = 'anonymous';
             script.onload = resolve;
             script.onerror = () => reject(new Error('Leaflet indisponible'));
 
