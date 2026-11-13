@@ -33,6 +33,10 @@ Données cartographiques et d'adresses © les contributeurs OpenStreetMap.
 
 La police [Fredoka](https://fonts.google.com/specimen/Fredoka) est hébergée dans `fonts/`, sous licence SIL Open Font License.
 
+## Hors connexion
+
+`sw.js` garde une copie des fichiers du site pour qu'il marche hors connexion. En ligne, il va toujours chercher la dernière version. Il faut incrémenter `CACHE` dans `sw.js` quand la liste des fichiers précachés (`PRECACHE`) change. La recherche de lieux et la carte demandent une connexion.
+
 ## Lancer en local
 
 Ouvrir `index.html` dans un navigateur suffit. Pour tester dans les conditions du site en ligne :

@@ -892,7 +892,7 @@ function onSearchInput() {
         runSearch(query).catch((error) => {
             console.warn('Recherche de lieu impossible:', error);
             displayResults([]);
-            setSearchStatus('Recherche indisponible pour le moment.');
+            setSearchStatus(searchFailureMessage());
         });
     }, 300);
 }
@@ -911,8 +911,12 @@ async function onSearchSubmit(event) {
         }
     } catch (error) {
         console.warn('Recherche de lieu impossible:', error);
-        setSearchStatus('Recherche indisponible pour le moment.');
+        setSearchStatus(searchFailureMessage());
     }
+}
+
+function searchFailureMessage() {
+    return navigator.onLine ? 'Recherche indisponible pour le moment.' : 'Recherche de lieux indisponible hors connexion.';
 }
 
 function locateUser() {
@@ -974,9 +978,12 @@ async function toggleMap() {
         console.warn('Carte indisponible:', error);
         container.hidden = true;
         $('mapButton').setAttribute('aria-expanded', 'false');
-        setSearchStatus('La carte n’a pas pu être chargée.');
+        setSearchStatus(navigator.onLine ? 'La carte n’a pas pu être chargée.' : 'La carte nécessite une connexion.');
         return;
     }
+
+    // Hors connexion, la carte s'ouvre sans ses images : on dit pourquoi.
+    if (!navigator.onLine) setSearchStatus('La carte nécessite une connexion.');
 
     if (!map) {
         map = L.map(container).setView([46.603354, 1.888334], 5);
@@ -1134,3 +1141,8 @@ function start() {
 }
 
 document.addEventListener('DOMContentLoaded', start);
+
+// Mode hors connexion (sw.js). Seulement en http(s) : ouvert directement (file://), le site marche sans.
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+    navigator.serviceWorker.register('sw.js').catch((error) => console.warn('Mode hors connexion indisponible:', error));
+}
