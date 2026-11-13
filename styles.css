@@ -838,6 +838,55 @@ a {
     color: var(--muted);
 }
 
+.credits p + p {
+    margin-top: 8px;
+}
+
+/* Page de confidentialité : même apparence, sans la bande des jours. */
+.app.legal {
+    max-width: 720px;
+    padding-bottom: calc(env(safe-area-inset-bottom) + 32px);
+}
+
+.legal .panel {
+    margin-top: 12px;
+}
+
+.legal h2 {
+    margin: 22px 0 6px;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: var(--moon);
+}
+
+.legal p,
+.legal li {
+    color: #d5d9e6;
+}
+
+.legal p + p,
+.legal ul + p {
+    margin-top: 8px;
+}
+
+.legal ul {
+    padding-left: 1.2em;
+    list-style: disc;
+}
+
+.legal li + li {
+    margin-top: 4px;
+}
+
+.legal code {
+    font-size: 0.875em;
+    color: var(--moonlight);
+}
+
+.legal .place-chip {
+    text-decoration: none;
+}
+
 /* Choix du lieu : panneau venu du bas, plein écran sur mobile pour rester au-dessus du clavier */
 
 .sheet {
