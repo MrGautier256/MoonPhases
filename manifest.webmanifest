@@ -1,4 +1,5 @@
 {
+    "id": "/MoonPhases/",
     "name": "Phase Lunaire",
     "short_name": "Lune",
     "description": "La phase de la Lune jour après jour, les levers et couchers là où vous êtes.",
@@ -10,6 +11,7 @@
     "theme_color": "#0a0e1c",
     "icons": [
         { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-        { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+        { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+        { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
     ]
 }
